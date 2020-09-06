@@ -38,7 +38,7 @@
           </v-list-item>
         </v-list>
       </v-navigation-drawer>
-      <div class="pa-4">
+      <v-container class="pa-4">
         <template v-if="currentPage === 'dashboard'">
           <h2>Trang chủ</h2>
           <h4>Đoán thể loại:</h4>
@@ -46,7 +46,16 @@
           <v-btn @click="doPredict">Dự đoán</v-btn>
           <div class="mt-5">
             <h4>Kết quả:</h4>
-            {{ result }}
+            <v-progress-circular
+              v-if="isLoading"
+              :size="70"
+              :width="7"
+              color="purple"
+              indeterminate
+            />
+            <template v-else>
+              {{ result }}
+            </template>
           </div>
         </template>
         <template v-else-if="currentPage === 'list'">
@@ -93,7 +102,7 @@
           <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. là lá la lala.</p>
           <p>Đây là bài <b>Phân thể loại bài hát</b> dựa trên <strong>Naive Bayes</strong> được làm bởi nhóm của Thắng và Kiên</p>
         </template>
-      </div>
+      </v-container>
     </v-layout>
   </v-app>
 </template>
@@ -117,7 +126,7 @@ export default {
       items: [
         { title: 'Trang chủ', value: 'dashboard', icon: 'mdi-view-dashboard' },
         { title: 'Danh sách', value: 'list', icon: 'mdi-format-list-bulleted' },
-        { title: 'Túi đựng từ', value: 'bow', icon: 'mdi-format-list-bulleted' },
+        { title: 'Túi đựng từ', value: 'bow', icon: 'mdi-alpha-b-circle' },
         { title: 'About', value: 'about', icon: 'mdi-help-box' },
       ],
       headersSongs: [
@@ -159,7 +168,8 @@ export default {
       keywordBow: '',
       filterSong: '',
       filterBow: '',
-      showSastify: false
+      showSastify: false,
+      isLoading: false
     }
   },
   computed: {
@@ -211,6 +221,7 @@ export default {
   methods: {
     async doPredict () {
       if (this.predictText) {
+        this.isLoading = true
         try {
           const { data } = await Axios.post('http://localhost:3000/predict', { text: this.predictText }, {
             headers: {
@@ -222,6 +233,7 @@ export default {
         } catch (error) {
           console.log(error)        
         }
+        this.isLoading = false
       }
     },
     gotoLink (e) {
